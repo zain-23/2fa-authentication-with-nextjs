@@ -30,6 +30,7 @@ const RegisterForm = () => {
     defaultValues: {
       email: "",
       password: "",
+      name: "",
     },
   });
 
@@ -43,6 +44,7 @@ const RegisterForm = () => {
           setError(data.error);
         } else {
           setSuccess(data.success);
+          form.reset();
         }
       });
     });
