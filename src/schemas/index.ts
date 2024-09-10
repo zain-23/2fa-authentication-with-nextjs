@@ -14,6 +14,20 @@ export const loginSchema = z.object({
   }),
 });
 
+export const newPasswordSchema = z
+  .object({
+    password: z.string().nonempty({
+      message: "Password is required",
+    }),
+    confirmPassword: z.string().nonempty({
+      message: "Confirm password is required",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password must be same",
+    path: ["confirmPassword"],
+  });
+
 export const registerSchema = z.object({
   email: z
     .string()
@@ -34,4 +48,15 @@ export const registerSchema = z.object({
   name: z.string().nonempty({
     message: "Message is required",
   }),
+});
+
+export const resetPasswordEmailSchema = z.object({
+  email: z
+    .string()
+    .email({
+      message: "Email must be formated example@xyz.com",
+    })
+    .nonempty({
+      message: "Email is required",
+    }),
 });

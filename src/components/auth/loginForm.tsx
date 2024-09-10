@@ -20,6 +20,7 @@ import { FormSuccess } from "@/components/formSuccess";
 import { useState, useTransition } from "react";
 import { login } from "@/actions/login";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -89,12 +90,19 @@ const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="******"
-                      disabled={isPending}
-                    />
+                    <>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="******"
+                        disabled={isPending}
+                      />
+                      <Button asChild variant={"link"} size={"sm"}>
+                        <Link href={"/auth/reset-password"}>
+                          Forgot Password?
+                        </Link>
+                      </Button>
+                    </>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
