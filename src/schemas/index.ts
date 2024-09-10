@@ -12,6 +12,7 @@ export const loginSchema = z.object({
   password: z.string().nonempty({
     message: "Password is required",
   }),
+  code: z.optional(z.string()),
 });
 
 export const newPasswordSchema = z
