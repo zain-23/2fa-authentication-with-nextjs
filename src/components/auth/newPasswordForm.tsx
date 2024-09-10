@@ -18,11 +18,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { newPasswordSchema } from "@/schemas";
 import { useState, useTransition } from "react";
+import { notFound, useSearchParams } from "next/navigation";
+import { newPasssword } from "@/actions/new-password";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const NewPasswordForm = () => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
+  const searchParams = useSearchParams();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const token = searchParams.get("token");
+
+  if (!token) return notFound();
 
   const form = useForm<z.infer<typeof newPasswordSchema>>({
     resolver: zodResolver(newPasswordSchema),
@@ -33,17 +42,18 @@ const NewPasswordForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof newPasswordSchema>) => {
-    // setSuccess("");
-    // setError("");
-    // startTransition(() => {
-    //   login(values).then((data) => {
-    //     if (data.error) {
-    //       setError(data.error);
-    //     } else {
-    //       setSuccess(data.success);
-    //     }
-    //   });
-    // });
+    setSuccess("");
+    setError("");
+    startTransition(() => {
+      newPasssword(values, token).then((data) => {
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setSuccess(data.success);
+          form.reset();
+        }
+      });
+    });
   };
   return (
     <CardWrapper
@@ -63,8 +73,7 @@ const NewPasswordForm = () => {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="johndeo@example.com"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       disabled={isPending}
                     />
                   </FormControl>
@@ -81,8 +90,7 @@ const NewPasswordForm = () => {
                   <FormControl>
                     <Input
                       {...field}
-                      type="password"
-                      placeholder="******"
+                      type={showPassword ? "text" : "password"}
                       disabled={isPending}
                     />
                   </FormControl>
@@ -98,6 +106,17 @@ const NewPasswordForm = () => {
           </Button>
         </form>
       </Form>
+      <div className="mt-4 flex items-center">
+        <Checkbox
+          id="showPassword"
+          onCheckedChange={(value) => {
+            setShowPassword(Boolean(value));
+          }}
+        />
+        <label htmlFor="showPassword" className="ml-2">
+          Show Password
+        </label>
+      </div>
     </CardWrapper>
   );
 };
