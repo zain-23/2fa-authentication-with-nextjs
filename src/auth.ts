@@ -1,8 +1,8 @@
+import { getUserById } from "@/data/user";
+import { db } from "@/lib/db";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 import authConfig from "../auth.config";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { db } from "@/lib/db";
-import { getUserById } from "@/data/user";
 
 export const {
   handlers: { GET, POST },
@@ -28,6 +28,19 @@ export const {
     },
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") return true;
+
+      const existingUser = await db.user.findUnique({
+        where: {
+          id: user.id,
+        },
+      });
+
+      if (!existingUser?.emailVerified) return false;
+
+      return true;
+    },
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub;

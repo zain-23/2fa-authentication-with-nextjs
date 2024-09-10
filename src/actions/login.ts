@@ -1,6 +1,8 @@
 "use server";
-
 import { signIn } from "@/auth";
+import { generateVerificationToken } from "@/data/tokens";
+import { getUserByEmail } from "@/data/user";
+import { sendVerificationToken } from "@/lib/mail";
 import { DEFAULT_LOGIN_REDIRECT } from "@/route";
 import { loginSchema } from "@/schemas";
 import { AuthError } from "next-auth";
@@ -14,6 +16,22 @@ export const login = async (values: z.infer<typeof loginSchema>) => {
   }
 
   const { email, password } = validatedFields.data;
+
+  const existingUser = await getUserByEmail(email);
+
+  if (!existingUser || !existingUser.email || !existingUser.password) {
+    return { error: "Email does'nt exist" };
+  }
+
+  if (!existingUser.emailVerified) {
+    const verificationToken = await generateVerificationToken(email);
+
+    await sendVerificationToken(email, verificationToken.token);
+
+    return {
+      success: "Confirmation email sent please verify your account first",
+    };
+  }
 
   try {
     await signIn("credentials", {
