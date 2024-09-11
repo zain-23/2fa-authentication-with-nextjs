@@ -5,12 +5,7 @@ import NextAuth from "next-auth";
 import authConfig from "../auth.config";
 import { getTwoFactorConfirmationById } from "./data/twoFactorConfirmation";
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   pages: {
     signIn: "/auth/login",
@@ -61,6 +56,7 @@ export const {
       if (session.user && token.sub) {
         session.user.id = token.sub;
         session.user.role = token.role;
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
       }
       return session;
     },
@@ -71,6 +67,7 @@ export const {
       if (!existingUser) return token;
 
       token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
       return token;
     },
   },

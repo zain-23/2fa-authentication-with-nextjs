@@ -31,8 +31,6 @@ const NewPasswordForm = () => {
 
   const token = searchParams.get("token");
 
-  if (!token) return notFound();
-
   const form = useForm<z.infer<typeof newPasswordSchema>>({
     resolver: zodResolver(newPasswordSchema),
     defaultValues: {
@@ -40,6 +38,8 @@ const NewPasswordForm = () => {
       confirmPassword: "",
     },
   });
+
+  if (!token) return notFound();
 
   const onSubmit = (values: z.infer<typeof newPasswordSchema>) => {
     setSuccess("");

@@ -13,9 +13,8 @@ const NewVerificationForm = () => {
   const [succes, setSuccess] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-  if (!token) return notFound();
-
   useEffect(() => {
+    if (!token) return notFound();
     UserVerification(token).then((data) => {
       if (data.success) {
         setSuccess(data.success);
